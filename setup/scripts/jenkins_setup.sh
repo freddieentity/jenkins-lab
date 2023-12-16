@@ -16,10 +16,10 @@ echo \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-systemctl enable docker
-systemctl start docker
-groupadd -g 998 docker
-usermod -aG docker ubuntu
+sudo systemctl enable docker
+sudo systemctl start docker
+sudo groupadd -g 998 docker
+sudo usermod -aG docker ubuntu
 
 # run jenkins
 mkdir -p /var/jenkins_home

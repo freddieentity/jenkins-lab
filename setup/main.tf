@@ -15,7 +15,7 @@ resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
 
   tags = {
-    Name = "Jenkins"
+    Name = var.app
   }
 }
 
@@ -39,38 +39,38 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 }
 
-resource "aws_instance" "jenkins" {
-  ami           = "ami-08d4ac5b634553e16"
-  instance_type = "t3.medium"
-  user_data = file("${path.module}/scripts/jenkins_setup.sh")
-  subnet_id = aws_subnet.public.id
-  vpc_security_group_ids = [aws_security_group.jenkins.id]
-  key_name = var.key_name
+resource "aws_instance" "main" {
+  ami                    = var.ami
+  instance_type          = var.instance_type
+  user_data              = file("${path.module}/scripts/${var.script}.sh")
+  subnet_id              = aws_subnet.public.id
+  vpc_security_group_ids = [aws_security_group.main.id]
+  key_name               = var.key_name
 
   tags = {
-    Name = "Jenkins"
+    Name = var.app
   }
 }
 
-resource "aws_security_group" "jenkins" {
-  name        = "jenkins"
-  description = "Jenkins UI and SSH allowed"
+resource "aws_security_group" "main" {
+  name        = var.app
+  description = "8080 and SSH allowed"
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    description      = "Jenkins UI"
-    from_port        = 8080
-    to_port          = 8080
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    description = "8080 Port"
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    description      = "SSH"
-    from_port        = 22
-    to_port          = 22
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    description = "SSH"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -82,6 +82,6 @@ resource "aws_security_group" "jenkins" {
   }
 
   tags = {
-    Name = "Jenkins"
+    Name = var.app
   }
 }
